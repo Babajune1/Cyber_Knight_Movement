@@ -8,11 +8,13 @@ var DASH_VELOCITY = 4500.0
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @onready var anim = get_node("AnimationPlayer")
+
 var dashing = false
 var can_dash = true
+
 var action_direction = -1
+
 var slashing = false
-var can_slash = true
 var shooting = false
 
 func ready(): 
@@ -21,11 +23,11 @@ func ready():
 
 	
 func shoot():
-	if Input.is_action_just_pressed("shoot") and is_on_floor():
+	if Input.is_action_just_pressed("shoot") and is_on_floor() and velocity.y == 0 and not slashing:
 		anim.current_animation = "Shoot"
 
 func slash():
-	if Input.is_action_just_pressed("slash") and is_on_floor() and can_slash:
+	if Input.is_action_just_pressed("slash") and is_on_floor() and velocity.y == 0 and not shooting:
 		anim.current_animation = ("Slash")
 
 func dash():
@@ -65,9 +67,10 @@ func _physics_process(delta):
 		$AnimatedSprite2D.flip_h = false
 	elif direction == 1:
 		$AnimatedSprite2D.flip_h = true
+
 	if direction and not dashing:
 		velocity.x = direction * SPEED
-		if velocity.y == 0:
+		if velocity.y == 0 and not slashing and not shooting:
 			anim.play("Run")
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
@@ -82,7 +85,6 @@ func _physics_process(delta):
 
 func _on_animation_player_animation_started(anim_name):
 	if anim_name == "Shoot":
-		print("shooting")
 		shooting = true
 		
 	if anim_name == "Slash":
@@ -95,7 +97,6 @@ func _on_animation_player_animation_started(anim_name):
 
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "Shoot":
-		print("shot")
 		shooting = false
 		
 	if anim_name == "Slash":
