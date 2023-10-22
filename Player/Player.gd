@@ -16,6 +16,7 @@ var action_direction = -1
 
 var slashing = false
 var shooting = false
+var can_jump = true
 
 func ready(): 
 	$DashCollisionShape2D.disabled = true
@@ -55,7 +56,7 @@ func _physics_process(delta):
 	slash()
 	
 	# Handle Jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Input.is_action_just_pressed("ui_accept") and is_on_floor() and can_jump:
 		can_dash = true
 		if not dashing:
 			velocity.y = JUMP_VELOCITY
@@ -85,9 +86,11 @@ func _physics_process(delta):
 
 func _on_animation_player_animation_started(anim_name):
 	if anim_name == "Shoot":
+		can_jump = false
 		shooting = true
 		
 	if anim_name == "Slash":
+		can_jump = false
 		slashing = true
 	
 	if anim_name == "Dash":
@@ -97,9 +100,11 @@ func _on_animation_player_animation_started(anim_name):
 
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "Shoot":
+		can_jump = true
 		shooting = false
 		
 	if anim_name == "Slash":
+		can_jump = true
 		slashing = false
 	
 	if anim_name == "Dash":
